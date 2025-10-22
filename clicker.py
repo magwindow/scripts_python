@@ -1,6 +1,8 @@
 import time
+
 import mouse
 import keyboard
+from win11toast import toast
 
 isClicking= False
 
@@ -8,10 +10,10 @@ def on_click():
     global isClicking
     if isClicking:
         isClicking = False
-        print('Clicker off')
+        toast('Clicker off')
     else:
         isClicking = True
-        print('Clicker on')
+        toast('Clicker on')
 
 keyboard.add_hotkey('Alt + Z', on_click)
 
