@@ -1,10 +1,16 @@
 import os
-import time 
+import time
+import zipfile 
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-from config import PATH_IMAGES, PATH_MUSIC, PATH_OTHER, PATH_TRASH, PATH_VIDEOS
+from config import (MEDIA_SORT, 
+                    PATH_IMAGES,
+                    PATH_MUSIC, 
+                    PATH_OTHER, 
+                    PATH_TRASH, 
+                    PATH_VIDEOS)
 
 class Sort(FileSystemEventHandler):
     def on_modified(self, event):
@@ -40,15 +46,51 @@ folder_videos = PATH_VIDEOS
 folder_music = PATH_MUSIC
 folder_other = PATH_OTHER
 
-sort = Sort()
-observer = Observer()
-observer.schedule(sort, folder_trash, recursive=True)
-observer.start()
+print('1 - Sort')
+print('2 - Archiving')
+mode = int(input('Select mode: '))
 
-try:
-    while True:
-        time.sleep(10)
-except KeyboardInterrupt:
-    observer.stop()
+if mode == 1:
+    sort = Sort()
+    observer = Observer()
+    observer.schedule(sort, folder_trash, recursive=True)
+    observer.start()
+
+    try:
+        while True:
+            time.sleep(10)
+    except KeyboardInterrupt:
+        observer.stop()
+
+elif mode == 2:
+    name = input('Enter archive name: ')
+    print('Creating archive...')
+    zip_file = zipfile.ZipFile(name + '.zip', 'w')
+    for root, dirs, files in os.walk(MEDIA_SORT):
+        for file in files:
+            zip_file.write(os.path.join(root, file))
+    zip_file.close()
+    print('Archive created')
+     
+    print('Deleting files in the folder...')    
+    for filename in os.listdir(folder_images):
+        file = folder_images + '/' + filename
+        os.remove(file)
+        
+    for filename in os.listdir(folder_videos):
+        file = folder_videos + '/' + filename
+        os.remove(file)
+        
+    for filename in os.listdir(folder_music):
+        file = folder_music + '/' + filename
+        os.remove(file)
+        
+    for filename in os.listdir(folder_other):
+        file = folder_other + '/' + filename
+        os.remove(file)
+    print('Done')
+        
+else:
+    print('Incorrect mode')
                 
                 
